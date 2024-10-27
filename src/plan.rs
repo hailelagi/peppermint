@@ -1,5 +1,5 @@
 //! Logical Planner
-//! 
+//!
 
 #[derive(Debug, Clone)]
 pub struct Relation {
@@ -31,17 +31,19 @@ pub enum Aggregation {
     Count,
 }
 
-
 impl Relation {
     pub fn select(&self, idx: usize, expr: &str) -> Relation {
-        let result: Vec<Vec<String>> = self.rows
+        let result: Vec<Vec<String>> = self
+            .rows
             .iter()
-            .filter(|row| row[idx] == expr) 
+            .filter(|row| row[idx] == expr)
             .cloned()
             .collect();
 
-            
-        let cols = self.column_names.iter().map(|c| Column{name: c.clone(), distinct: false});
+        let cols = self.column_names.iter().map(|c| Column {
+            name: c.clone(),
+            distinct: false,
+        });
 
         Relation {
             column_names: self.column_names.clone(),
@@ -51,10 +53,14 @@ impl Relation {
     }
 
     pub fn projection(&self, columns: &[usize]) -> Relation {
-        let result: Vec<Vec<String>> = self.rows
+        let result: Vec<Vec<String>> = self
+            .rows
             .iter()
             .map(|row| {
-                columns.iter().map(|&col_idx| row[col_idx].clone()).collect()
+                columns
+                    .iter()
+                    .map(|&col_idx| row[col_idx].clone())
+                    .collect()
             })
             .collect();
 

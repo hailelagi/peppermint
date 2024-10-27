@@ -1,3 +1,3 @@
-pub struct HyperLogLog {
+//! HyperLogLog
 
-}
+pub struct HyperLogLog {}
