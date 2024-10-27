@@ -1,11 +1,10 @@
 //! Logical Planner
 //!
 
-use crate::parser::{Parser, SqlStatement};
+use crate::parser::SqlStatement;
 
 #[derive(Debug, Clone)]
 pub struct Relation {
-    pub column_names: Vec<String>,
     pub columns: Vec<Column>,
     pub rows: Vec<Vec<String>>,
 }
@@ -34,7 +33,6 @@ pub enum Aggregation {
 }
 
 #[derive(Debug, PartialEq)]
-
 pub struct LogicalPlan {
     pub statement: SelectStatement,
 }
@@ -65,14 +63,9 @@ impl Relation {
             .cloned()
             .collect();
 
-        let cols = self.column_names.iter().map(|c| Column {
-            name: c.clone(),
-            distinct: false,
-        });
 
         Relation {
-            column_names: self.column_names.clone(),
-            columns: cols.collect(),
+            columns: self.columns.clone(),
             rows: result,
         }
     }
@@ -89,19 +82,10 @@ impl Relation {
             })
             .collect();
 
-        let col_names: Vec<String> = columns
-            .iter()
-            .map(|&col_idx| self.column_names[col_idx].clone())
-            .collect();
-
-        let columns: Vec<String> = columns
-            .iter()
-            .map(|&col_idx| self.column_names[col_idx].clone())
-            .collect();
+        // todo: project the aggregation
 
         Relation {
-            columns: todo!(),
-            column_names: col_names,
+            columns: self.columns.clone(),
             rows: result,
         }
     }
@@ -110,6 +94,7 @@ impl Relation {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::parser::Parser;
 
     #[test]
     fn test_plan_count() {
