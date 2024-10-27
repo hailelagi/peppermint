@@ -8,7 +8,7 @@ pub struct Relation {
 }
 
 impl Relation {
-        pub fn select(&self, idx: usize, expr: &str) -> Relation {
+    pub fn select(&self, idx: usize, expr: &str) -> Relation {
         let result: Vec<Vec<String>> = self.rows
             .iter()
             .filter(|row| row[idx] == expr) 
