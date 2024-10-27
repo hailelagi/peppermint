@@ -9,7 +9,10 @@ pub struct ApprxCounter {
 
 impl ApprxCounter {
     pub fn new() -> ApprxCounter {
-        ApprxCounter { count: 0, rng: rand::thread_rng() }
+        ApprxCounter {
+            count: 0,
+            rng: rand::thread_rng(),
+        }
     }
 
     pub fn increment(&mut self) {

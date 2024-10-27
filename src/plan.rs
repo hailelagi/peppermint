@@ -1,6 +1,8 @@
 //! Logical Planner
 //!
 
+use crate::parser::{Parser, SqlStatement};
+
 #[derive(Debug, Clone)]
 pub struct Relation {
     pub column_names: Vec<String>,
@@ -29,6 +31,29 @@ pub struct SelectStatement {
 #[derive(Debug, PartialEq)]
 pub enum Aggregation {
     Count,
+}
+
+#[derive(Debug, PartialEq)]
+
+pub struct LogicalPlan {
+    pub statement: SelectStatement,
+}
+
+impl LogicalPlan {
+    pub fn new(statement: SqlStatement) -> LogicalPlan {
+        LogicalPlan {
+            statement: SelectStatement {
+                projection: AggregateExpression {
+                    function: Aggregation::Count,
+                    column: Column {
+                        name: statement.column_name,
+                        distinct: statement.distinct,
+                    },
+                },
+                table: statement.table_name,
+            },
+        }
+    }
 }
 
 impl Relation {
@@ -79,5 +104,54 @@ impl Relation {
             column_names: col_names,
             rows: result,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_plan_count() {
+        let sql = "SELECT COUNT(col) FROM table;";
+        let mut parser = Parser::new(sql);
+        let plan = LogicalPlan::new(parser.parse().unwrap());
+
+        let expected = LogicalPlan {
+            statement: SelectStatement {
+                projection: AggregateExpression {
+                    function: Aggregation::Count,
+                    column: Column {
+                        name: "col".to_string(),
+                        distinct: false,
+                    },
+                },
+                table: "table".to_string(),
+            },
+        };
+
+        assert_eq!(plan, expected);
+    }
+
+    #[test]
+    fn test_plan_count_distinct() {
+        let sql = "SELECT COUNT(DISTINCT col1) FROM table1";
+        let mut parser = Parser::new(sql);
+        let plan = LogicalPlan::new(parser.parse().unwrap());
+
+        let expected = LogicalPlan {
+            statement: SelectStatement {
+                projection: AggregateExpression {
+                    function: Aggregation::Count,
+                    column: Column {
+                        name: "col1".to_string(),
+                        distinct: true,
+                    },
+                },
+                table: "table1".to_string(),
+            },
+        };
+
+        assert_eq!(plan, expected);
     }
 }

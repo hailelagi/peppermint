@@ -1,11 +1,16 @@
 //! Parser
 
-use crate::plan::{AggregateExpression, Aggregation, Column, SelectStatement};
-
 #[derive(Debug)]
 pub struct Parser {
     tokens: Vec<String>,
     position: usize,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct SqlStatement {
+    pub table_name: String,
+    pub column_name: String,
+    pub distinct: bool,
 }
 
 impl Parser {
@@ -24,7 +29,7 @@ impl Parser {
         }
     }
 
-    pub fn parse(&mut self) -> Result<SelectStatement, String> {
+    pub fn parse(&mut self) -> Result<SqlStatement, String> {
         self.expect("select")?;
         self.expect("count")?;
         self.expect("(")?;
@@ -57,15 +62,10 @@ impl Parser {
             }
         }
 
-        Ok(SelectStatement {
-            projection: AggregateExpression {
-                function: Aggregation::Count,
-                column: Column {
-                    name: column_name,
-                    distinct,
-                },
-            },
-            table: table_name,
+        Ok(SqlStatement {
+            table_name,
+            column_name,
+            distinct,
         })
     }
 
@@ -100,16 +100,10 @@ mod tests {
     fn test_parse_count() {
         let sql = "SELECT COUNT(col2) FROM table1;";
         let mut parser = Parser::new(sql);
-
-        let expected = SelectStatement {
-            projection: AggregateExpression {
-                function: Aggregation::Count,
-                column: Column {
-                    name: "col2".to_string(),
-                    distinct: false,
-                },
-            },
-            table: "table1".to_string(),
+        let expected = SqlStatement {
+            table_name: "table1".to_string(),
+            column_name: "col2".to_string(),
+            distinct: false,
         };
 
         assert_eq!(parser.parse().unwrap(), expected);
@@ -120,15 +114,10 @@ mod tests {
         let sql = "SELECT COUNT(DISTINCT col1) FROM table1;";
         let mut parser = Parser::new(sql);
 
-        let expected = SelectStatement {
-            projection: AggregateExpression {
-                function: Aggregation::Count,
-                column: Column {
-                    name: "col1".to_string(),
-                    distinct: true,
-                },
-            },
-            table: "table1".to_string(),
+        let expected = SqlStatement {
+            table_name: "table1".to_string(),
+            column_name: "col1".to_string(),
+            distinct: true,
         };
 
         assert_eq!(parser.parse().unwrap(), expected);
@@ -139,15 +128,10 @@ mod tests {
         let sql = "select count(distinct col3) from table1;";
         let mut parser = Parser::new(sql);
 
-        let expected = SelectStatement {
-            projection: AggregateExpression {
-                function: Aggregation::Count,
-                column: Column {
-                    name: "col3".to_string(),
-                    distinct: true,
-                },
-            },
-            table: "table1".to_string(),
+        let expected = SqlStatement {
+            table_name: "table1".to_string(),
+            column_name: "col3".to_string(),
+            distinct: true,
         };
 
         assert_eq!(parser.parse().unwrap(), expected);
