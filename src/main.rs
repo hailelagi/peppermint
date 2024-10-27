@@ -3,6 +3,7 @@ mod hll;
 mod parser;
 mod plan;
 
+
 fn main() {
     let mut counter = morris::ApprxCounter::new();
     
@@ -13,7 +14,8 @@ fn main() {
     println!("Estimated count: {}", counter.estimate());
 
     let relation = plan::Relation {
-        col_names: vec!["id".to_string(), "name".to_string(), "age".to_string()],
+        column_names: vec!["id".to_string(), "name".to_string(), "age".to_string()],
+        columns: todo!(),
         rows: vec![
             vec!["1".to_string(), "Alice".to_string(), "30".to_string()],
             vec!["2".to_string(), "Bob".to_string(), "25".to_string()],
@@ -27,4 +29,18 @@ fn main() {
 
     println!("{:?}", projected_relation);
     println!("{:?}", filtered_relation);
+
+    let sql = "SELECT COUNT(DISTINCT col1) FROM table1;";
+    let mut parser = parser::Parser::new(sql);
+    
+    match parser.parse() {
+        Ok(ast) => {
+            println!("Parsed AST: {:?}", ast);
+            
+
+            // let count = count_distinct(&ast.projection.column, &ast.table);
+            // println!("Count result: {}", count);
+        },
+        Err(e) => println!("Error parsing SQL: {}", e),
+    }
 }
