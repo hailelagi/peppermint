@@ -17,8 +17,6 @@ impl ApprxCounter {
 
     pub fn increment(&mut self) {
         let random_value: f64 = self.rng.gen(); // 0.0 -> 1.0
-
-        // does not seem, correct?
         let probability = 1.0 / (2.0_f64.powi(self.count as i32));
 
         // Increment the count with the probabilistic approach
