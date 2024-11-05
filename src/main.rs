@@ -1,6 +1,5 @@
 use plan::Column;
 
-mod hll;
 mod morris;
 mod parser;
 mod plan;
@@ -12,10 +11,6 @@ fn main() {
     match parser.parse() {
         Ok(ast) => {
             println!("Parsed AST: {:?}", ast);
-
-            // todo: counter
-            // let count = count_distinct(&ast.projection.column, &ast.table);
-            // println!("Count result: {}", count);
         }
         Err(e) => println!("Error parsing SQL: {}", e),
     }

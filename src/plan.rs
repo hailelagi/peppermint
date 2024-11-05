@@ -82,7 +82,7 @@ impl Relation {
             })
             .collect();
 
-        // todo: project the aggregation
+        // dispatch to count
 
         Relation {
             columns: self.columns.clone(),
